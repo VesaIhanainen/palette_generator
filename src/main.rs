@@ -18,9 +18,9 @@ fn main() {
     let centroids = return_colors(test_image, k, 100);
     println!("End result:");
     for x in centroids {
-        let r = x.rgb[0] * 256.0f64;
-        let g = x.rgb[1] * 256.0f64;
-        let b = x.rgb[2] * 256.0f64;
+        let r = x.rgb[0] * 256.0_f64;
+        let g = x.rgb[1] * 256.0_f64;
+        let b = x.rgb[2] * 256.0_f64;
         println!("R:{ }, G:{ }, B:{ }", r, g, b);
     }
 }
@@ -119,9 +119,9 @@ fn random_centroids(k: i32) -> Vec<Color> {
     let mut centroids = Vec::<Color>::new();
     let mut rng = rand::thread_rng();
     for _i in 0..k {
-        let r = (rng.gen_range(1, 255) as f64) / 255_f64;
-        let b = (rng.gen_range(1, 255) as f64) / 255_f64;
-        let g = (rng.gen_range(1, 255) as f64) / 255_f64;
+        let r = (rng.gen_range(1, 255) as f64) / 256.0_f64;
+        let b = (rng.gen_range(1, 255) as f64) / 256.0_f64;
+        let g = (rng.gen_range(1, 255) as f64) / 256.0_f64;
 
         let a = Color { rgb: [r, g, b] };
         centroids.push(a);
