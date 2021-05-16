@@ -1,7 +1,7 @@
 extern crate image;
 extern crate kdtree;
 
-use image::GenericImageView;
+use image::{GenericImageView,RgbImage, Rgb};
 use kdtree::distance::squared_euclidean;
 use kdtree::KdTree;
 use rand::Rng;
@@ -14,18 +14,30 @@ struct Cluster {
 }
 fn main() {
     let test_image = image::open("akira.jpg").unwrap();
-    let k = 5;
+    let k: u32 = 5;
     let centroids = return_colors(test_image, k, 100);
-    println!("End result:");
-    for x in centroids {
-        let r = x.rgb[0] * 256.0_f64;
-        let g = x.rgb[1] * 256.0_f64;
-        let b = x.rgb[2] * 256.0_f64;
-        println!("R:{ }, G:{ }, B:{ }", r, g, b);
-    }
+    println!("End result: output_palette.png");
+    let output_name = String::from("output_palette.png");
+    save_result(centroids,256,output_name);
 }
-
-fn return_colors(input_image: image::DynamicImage, k: i32, runs: i32) -> Vec<Color> {
+fn save_result(centroids: Vec<Color>, image_size: u32, image_name: String){
+    let mut resulting_image = RgbImage::new(image_size,image_size);
+    let mut index = 0;
+    let num_centroids = centroids.len() as u32;
+    for color in centroids {
+        let r:u8 = (color.rgb[0] * 256.0_f64) as u8;
+        let g:u8 = (color.rgb[1] * 256.0_f64) as u8;
+        let b:u8 = (color.rgb[2] * 256.0_f64) as u8;
+        for x in index*(image_size-1)/num_centroids..=(index+1)*(image_size-1)/num_centroids {
+            for y in 0..=(image_size-1){
+                resulting_image.put_pixel(x,y,Rgb([r,g,b]));
+            }
+        }
+        index = index + 1;
+    }
+    resulting_image.save(image_name);
+}
+fn return_colors(input_image: image::DynamicImage, k: u32, runs: i32) -> Vec<Color> {
     let mut centroids = random_centroids(k);
     let image_width = input_image.dimensions().0 as usize;
     let image_height = input_image.dimensions().1 as usize;
@@ -115,7 +127,7 @@ fn return_colors(input_image: image::DynamicImage, k: i32, runs: i32) -> Vec<Col
     return centroids;
 }
 
-fn random_centroids(k: i32) -> Vec<Color> {
+fn random_centroids(k: u32) -> Vec<Color> {
     let mut centroids = Vec::<Color>::new();
     let mut rng = rand::thread_rng();
     for _i in 0..k {
@@ -129,7 +141,7 @@ fn random_centroids(k: i32) -> Vec<Color> {
     return centroids;
 }
 
-fn init_clusters(k: i32) -> Vec<Cluster> {
+fn init_clusters(k: u32) -> Vec<Cluster> {
     let mut clusters = Vec::<Cluster>::new();
     for _i in 0..k {
         let new_cluster = Cluster {
